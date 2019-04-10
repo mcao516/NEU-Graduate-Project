@@ -1,3 +1,8 @@
+"""
+
+   Author: Meng Cao
+"""
+
 from models.data_utils import REGDataset
 from models.reg_model import REGShell
 from models.config import Config
