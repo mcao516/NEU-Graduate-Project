@@ -6,26 +6,6 @@ import torch.nn.functional as F
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-class Embedding_layer(nn.Module):
-    """Embedding layer of the model.
-    """
-    def __init__(self, vocab_size, embedding_dim, pre_trained=None):
-        """Initialize embedding layer. If pre_trained is provided, 
-           initialize the model using pre-trained embeddings.
-        """
-        super(Embedding_layer, self).__init__()
-        self.vocab_size = vocab_size
-        self.embedding_dim = embedding_dim
-        
-        self.embedding = nn.Embedding(vocab_size, embedding_dim)
-        if pre_trained is not None:
-            # apply pre-trained embeddings
-            self.embedding.weight.data.copy_(torch.from_numpy(pre_trained))
-    
-    def forward(self, input):
-        return self.embedding(input)
-
-
 # encoder net for the article
 class Encoder(Module):
     """Encoder network, encoding the description and context.
