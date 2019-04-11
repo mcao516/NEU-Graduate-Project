@@ -1,5 +1,6 @@
 """
-
+   Trainging file.
+   
    Author: Meng Cao
 """
 
