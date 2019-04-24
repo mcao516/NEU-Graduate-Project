@@ -1,0 +1,10 @@
+2019-04-23 14:14:32,189:INFO: Embedding file: data/glove.6B/glove.6B.100d.txt
+2019-04-23 14:14:32,189:INFO: Training file: data/webnlg/re-split-separated/WebNLG_separated_train.pickle
+2019-04-23 14:14:32,189:INFO: Char Embedding Size: 100
+2019-04-23 14:14:32,189:INFO: Learning Rate: 0.0037
+2019-04-23 14:14:32,189:INFO: Dropout Rate: 0.5
+2019-04-23 14:14:32,189:INFO: Batch size: 128
+2019-04-23 14:14:32,189:INFO: Hidden layer size: 100
+2019-04-23 14:14:32,189:INFO: Hidden char size: 50
+2019-04-23 14:14:32,189:INFO: start training...
+2019-04-23 14:14:32,189:INFO: Epoch 1 out of 35

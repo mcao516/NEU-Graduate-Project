@@ -1,11 +1,10 @@
-"""
-   Trainging file.
-   
-   Author: Meng Cao
-"""
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import torch
 
 from models.data_utils import REGDataset
-from models.reg_model import REGShell
+from models.model import REGShell
 from models.config import Config
 
 def main():
@@ -13,7 +12,8 @@ def main():
     config = Config(operation='train')
 
     # build model
-    model  = REGShell(config)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model  = REGShell(config, device)
 
     # create datasets
     train_set = REGDataset(config.filename_train, config=config, 

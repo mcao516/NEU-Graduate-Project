@@ -1,8 +1,12 @@
-from models.data_utils import REGDataset
-from models.reg_model import REGShell
-from models.config import Config
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+import torch
 import pickle
+
+from models.data_utils import REGDataset
+from models.model import REGShell
+from models.config import Config
 
 
 def write_prediction(filename, all_preds):
@@ -24,7 +28,8 @@ def main():
     config = Config(operation='predict')
 
     # build model
-    model  = REGShell(config)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model  = REGShell(config, device)
     model.restore_model('results/train/20181208_024721/model/checkpoint.pth.tar')
 
     # create datasets

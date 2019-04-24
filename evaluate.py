@@ -1,5 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import torch
+
 from models.data_utils import REGDataset
-from models.reg_model import REGShell
+from models.model import REGShell
 from models.config import Config
 
 def main():
@@ -7,7 +11,8 @@ def main():
     config = Config(operation='evaluate')
 
     # build model
-    model = REGShell(config)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = REGShell(config, device)
     model.restore_model('results/train/20180905_112821/model/checkpoint.pth.tar')
 
     # create datasets

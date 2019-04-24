@@ -5,13 +5,13 @@ from .general_utils import get_logger
 from .data_utils import load_vocab, get_processing_word, get_trimmed_glove_vectors
 from .data_utils import START_DECODING, STOP_DECODING, UNKNOWN_TOKEN
 
+
 class Config():
     def __init__(self, load=True, operation='train'):
         """Initialize hyperparameters and load vocabs
-
+        
         Args:
-            load_embeddings: (bool) if True, load embeddings into
-                np array, else None
+            load_embeddings: (bool) if True, load embeddings into np array, else None
 
         """
         self.dir_output = "results/{}/{:%Y%m%d_%H%M%S}/".format(operation, 
@@ -76,10 +76,10 @@ class Config():
     # filename_train = "data/all_data/new_data/WebNLG_train.pickle"
     
     split_type = 'separated'
-    filename_dev = "data/all_data/new_data/re-split-{0}/WebNLG_{0}_dev.pickle".format(split_type)
-    filename_test = "data/all_data/new_data/re-split-{0}/WebNLG_{0}_test.pickle".format(split_type)
-    filename_train = "data/all_data/new_data/re-split-{0}/WebNLG_{0}_train.pickle".format(split_type)
-    filename_sample = "data/all_data/new_data/samples.pickle"
+    filename_dev = "data/webnlg/re-split-{0}/WebNLG_{0}_dev.pickle".format(split_type)
+    filename_test = "data/webnlg/re-split-{0}/WebNLG_{0}_test.pickle".format(split_type)
+    filename_train = "data/webnlg/re-split-{0}/WebNLG_{0}_train.pickle".format(split_type)
+    filename_sample = "data/webnlg/samples.pickle"
 
     max_iter = None # if not None, max number of examples in Dataset
     max_enc_context = 80
@@ -89,10 +89,11 @@ class Config():
     filename_words = "data/words.txt"
     filename_chars = "data/chars.txt"
     filename_pronouns = "data/pronouns.txt"
-
+    
     use_chars = True
     nepochs   = 35
     nepoch_no_imprv = 5
+    char_emb_type = 'cnn'
 
     # model hyper parameters
     beam_size = 4

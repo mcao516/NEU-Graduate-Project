@@ -21,8 +21,6 @@ class Hypothesis(object):
                           log_prob= self.log_prob + log_prob)
 
 
-# TODO Enhancement: Project input embedding with previous context vector for 
-# current input
 class PointerAttentionDecoder(nn.Module):
     """Pointer-generator attention decoder.
     """
