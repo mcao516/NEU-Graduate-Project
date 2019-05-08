@@ -1,0 +1,342 @@
+2019-04-29 05:26:50,469:INFO: - Start building REG model...
+2019-04-29 05:26:51,117:INFO: Let's use 2 GPUs!
+2019-04-29 05:27:52,210:INFO: Embedding file: data/glove.6B/glove.6B.100d.txt
+2019-04-29 05:27:52,210:INFO: Training file: data/webnlg/WebNLG_train.pickle
+2019-04-29 05:27:52,211:INFO: Word Embedding Size: 100
+2019-04-29 05:27:52,211:INFO: Char Embedding Size: 50
+2019-04-29 05:27:52,211:INFO: Scheduler Type: multi
+2019-04-29 05:27:52,211:INFO: Learning Rate: 0.005
+2019-04-29 05:27:52,211:INFO: Learning Rate Decay: 0.9
+2019-04-29 05:27:52,211:INFO: L2 Regularization Rate: 1e-06
+2019-04-29 05:27:52,211:INFO: Dropout Rate: 0.2
+2019-04-29 05:27:52,211:INFO: Batch size: 64
+2019-04-29 05:27:52,211:INFO: Hidden layer size: 100
+2019-04-29 05:27:52,211:INFO: Hidden char size: 50
+2019-04-29 05:27:52,211:INFO: Earyly Stop: 100
+2019-04-29 05:27:52,211:INFO: start training...
+2019-04-29 05:27:52,211:INFO: Epoch 1 out of 100
+2019-04-29 05:30:35,850:INFO: Evaluating development set...
+2019-04-29 05:31:53,564:INFO: acc 64.91
+2019-04-29 05:31:55,249:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 05:31:55,249:INFO: - new best score!
+2019-04-29 05:31:55,249:INFO: Epoch 2 out of 100
+2019-04-29 05:34:44,696:INFO: Evaluating development set...
+2019-04-29 05:36:02,967:INFO: acc 67.66
+2019-04-29 05:36:04,656:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 05:36:04,656:INFO: - new best score!
+2019-04-29 05:36:04,656:INFO: Epoch 3 out of 100
+2019-04-29 05:38:38,813:INFO: Evaluating development set...
+2019-04-29 05:39:57,828:INFO: acc 67.54
+2019-04-29 05:39:57,828:INFO: Epoch 4 out of 100
+2019-04-29 05:43:09,086:INFO: Evaluating development set...
+2019-04-29 05:44:27,796:INFO: acc 68.63
+2019-04-29 05:44:29,495:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 05:44:29,495:INFO: - new best score!
+2019-04-29 05:44:29,495:INFO: Epoch 5 out of 100
+2019-04-29 05:47:10,851:INFO: Evaluating development set...
+2019-04-29 05:48:29,618:INFO: acc 69.04
+2019-04-29 05:48:31,304:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 05:48:31,304:INFO: - new best score!
+2019-04-29 05:48:31,305:INFO: Epoch 6 out of 100
+2019-04-29 05:51:25,448:INFO: Evaluating development set...
+2019-04-29 05:52:44,126:INFO: acc 68.55
+2019-04-29 05:52:44,127:INFO: Epoch 7 out of 100
+2019-04-29 05:55:54,019:INFO: Evaluating development set...
+2019-04-29 05:57:13,102:INFO: acc 68.68
+2019-04-29 05:57:13,103:INFO: Epoch 8 out of 100
+2019-04-29 05:59:49,483:INFO: Evaluating development set...
+2019-04-29 06:01:07,939:INFO: acc 68.85
+2019-04-29 06:01:07,940:INFO: Epoch 9 out of 100
+2019-04-29 06:03:40,860:INFO: Evaluating development set...
+2019-04-29 06:04:59,957:INFO: acc 68.32
+2019-04-29 06:04:59,957:INFO: Epoch 10 out of 100
+2019-04-29 06:08:01,880:INFO: Evaluating development set...
+2019-04-29 06:09:24,846:INFO: acc 69.20
+2019-04-29 06:09:26,529:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 06:09:26,529:INFO: - new best score!
+2019-04-29 06:09:26,529:INFO: Epoch 11 out of 100
+2019-04-29 06:12:08,688:INFO: Evaluating development set...
+2019-04-29 06:13:27,535:INFO: acc 68.78
+2019-04-29 06:13:27,536:INFO: Epoch 12 out of 100
+2019-04-29 06:16:17,973:INFO: Evaluating development set...
+2019-04-29 06:17:36,641:INFO: acc 69.28
+2019-04-29 06:17:38,330:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 06:17:38,330:INFO: - new best score!
+2019-04-29 06:17:38,331:INFO: Epoch 13 out of 100
+2019-04-29 06:20:43,503:INFO: Evaluating development set...
+2019-04-29 06:22:58,521:INFO: acc 69.00
+2019-04-29 06:22:58,522:INFO: Epoch 14 out of 100
+2019-04-29 06:25:47,532:INFO: Evaluating development set...
+2019-04-29 06:27:08,779:INFO: acc 69.13
+2019-04-29 06:27:08,780:INFO: Epoch 15 out of 100
+2019-04-29 06:30:13,849:INFO: Evaluating development set...
+2019-04-29 06:31:34,489:INFO: acc 68.86
+2019-04-29 06:31:34,490:INFO: Epoch 16 out of 100
+2019-04-29 06:34:29,298:INFO: Evaluating development set...
+2019-04-29 06:35:48,149:INFO: acc 68.38
+2019-04-29 06:35:48,149:INFO: Epoch 17 out of 100
+2019-04-29 06:38:34,861:INFO: Evaluating development set...
+2019-04-29 06:39:53,343:INFO: acc 68.87
+2019-04-29 06:39:53,344:INFO: Epoch 18 out of 100
+2019-04-29 06:42:54,508:INFO: Evaluating development set...
+2019-04-29 06:44:13,293:INFO: acc 68.96
+2019-04-29 06:44:13,294:INFO: Epoch 19 out of 100
+2019-04-29 06:47:07,401:INFO: Evaluating development set...
+2019-04-29 06:48:26,852:INFO: acc 68.04
+2019-04-29 06:48:26,853:INFO: Epoch 20 out of 100
+2019-04-29 06:51:38,421:INFO: Evaluating development set...
+2019-04-29 06:52:58,880:INFO: acc 69.06
+2019-04-29 06:52:58,880:INFO: Epoch 21 out of 100
+2019-04-29 06:55:58,569:INFO: Evaluating development set...
+2019-04-29 06:57:17,765:INFO: acc 69.25
+2019-04-29 06:57:17,766:INFO: Epoch 22 out of 100
+2019-04-29 07:00:03,242:INFO: Evaluating development set...
+2019-04-29 07:01:22,607:INFO: acc 70.24
+2019-04-29 07:01:24,290:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 07:01:24,290:INFO: - new best score!
+2019-04-29 07:01:24,290:INFO: Epoch 23 out of 100
+2019-04-29 07:04:27,563:INFO: Evaluating development set...
+2019-04-29 07:05:47,014:INFO: acc 70.45
+2019-04-29 07:05:48,704:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 07:05:48,705:INFO: - new best score!
+2019-04-29 07:05:48,705:INFO: Epoch 24 out of 100
+2019-04-29 07:08:50,080:INFO: Evaluating development set...
+2019-04-29 07:10:11,799:INFO: acc 70.48
+2019-04-29 07:10:13,478:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 07:10:13,479:INFO: - new best score!
+2019-04-29 07:10:13,479:INFO: Epoch 25 out of 100
+2019-04-29 07:12:55,565:INFO: Evaluating development set...
+2019-04-29 07:14:15,779:INFO: acc 70.86
+2019-04-29 07:14:17,468:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 07:14:17,468:INFO: - new best score!
+2019-04-29 07:14:17,468:INFO: Epoch 26 out of 100
+2019-04-29 07:16:48,565:INFO: Evaluating development set...
+2019-04-29 07:18:07,588:INFO: acc 70.65
+2019-04-29 07:18:07,589:INFO: Epoch 27 out of 100
+2019-04-29 07:21:07,006:INFO: Evaluating development set...
+2019-04-29 07:22:26,228:INFO: acc 70.66
+2019-04-29 07:22:26,229:INFO: Epoch 28 out of 100
+2019-04-29 07:25:25,592:INFO: Evaluating development set...
+2019-04-29 07:26:46,071:INFO: acc 70.90
+2019-04-29 07:26:47,782:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 07:26:47,782:INFO: - new best score!
+2019-04-29 07:26:47,782:INFO: Epoch 29 out of 100
+2019-04-29 07:29:35,734:INFO: Evaluating development set...
+2019-04-29 07:30:55,178:INFO: acc 71.00
+2019-04-29 07:30:56,879:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 07:30:56,879:INFO: - new best score!
+2019-04-29 07:30:56,879:INFO: Epoch 30 out of 100
+2019-04-29 07:33:49,088:INFO: Evaluating development set...
+2019-04-29 07:35:08,217:INFO: acc 70.88
+2019-04-29 07:35:08,218:INFO: Epoch 31 out of 100
+2019-04-29 07:37:55,154:INFO: Evaluating development set...
+2019-04-29 07:39:14,422:INFO: acc 70.73
+2019-04-29 07:39:14,423:INFO: Epoch 32 out of 100
+2019-04-29 07:41:40,168:INFO: Evaluating development set...
+2019-04-29 07:42:59,263:INFO: acc 70.90
+2019-04-29 07:42:59,263:INFO: Epoch 33 out of 100
+2019-04-29 07:45:54,923:INFO: Evaluating development set...
+2019-04-29 07:47:14,897:INFO: acc 70.88
+2019-04-29 07:47:14,898:INFO: Epoch 34 out of 100
+2019-04-29 07:50:04,390:INFO: Evaluating development set...
+2019-04-29 07:51:28,541:INFO: acc 70.83
+2019-04-29 07:51:28,541:INFO: Epoch 35 out of 100
+2019-04-29 07:54:15,158:INFO: Evaluating development set...
+2019-04-29 07:55:34,513:INFO: acc 71.17
+2019-04-29 07:55:36,205:INFO: - model saved at: results/train/20190429_052649/model/checkpoint.pth.tar
+2019-04-29 07:55:36,205:INFO: - new best score!
+2019-04-29 07:55:36,205:INFO: Epoch 36 out of 100
+2019-04-29 07:58:16,347:INFO: Evaluating development set...
+2019-04-29 07:59:35,475:INFO: acc 70.83
+2019-04-29 07:59:35,476:INFO: Epoch 37 out of 100
+2019-04-29 08:02:14,028:INFO: Evaluating development set...
+2019-04-29 08:03:33,084:INFO: acc 70.97
+2019-04-29 08:03:33,085:INFO: Epoch 38 out of 100
+2019-04-29 08:06:16,246:INFO: Evaluating development set...
+2019-04-29 08:07:35,505:INFO: acc 70.64
+2019-04-29 08:07:35,505:INFO: Epoch 39 out of 100
+2019-04-29 08:10:30,150:INFO: Evaluating development set...
+2019-04-29 08:11:49,527:INFO: acc 70.73
+2019-04-29 08:11:49,528:INFO: Epoch 40 out of 100
+2019-04-29 08:14:32,847:INFO: Evaluating development set...
+2019-04-29 08:15:52,331:INFO: acc 70.90
+2019-04-29 08:15:52,332:INFO: Epoch 41 out of 100
+2019-04-29 08:18:44,502:INFO: Evaluating development set...
+2019-04-29 08:20:04,050:INFO: acc 70.93
+2019-04-29 08:20:04,051:INFO: Epoch 42 out of 100
+2019-04-29 08:22:54,590:INFO: Evaluating development set...
+2019-04-29 08:24:14,162:INFO: acc 70.99
+2019-04-29 08:24:14,163:INFO: Epoch 43 out of 100
+2019-04-29 08:26:41,663:INFO: Evaluating development set...
+2019-04-29 08:28:00,848:INFO: acc 70.97
+2019-04-29 08:28:00,849:INFO: Epoch 44 out of 100
+2019-04-29 08:30:45,553:INFO: Evaluating development set...
+2019-04-29 08:32:05,100:INFO: acc 70.96
+2019-04-29 08:32:05,100:INFO: Epoch 45 out of 100
+2019-04-29 08:34:51,562:INFO: Evaluating development set...
+2019-04-29 08:36:11,181:INFO: acc 70.95
+2019-04-29 08:36:11,182:INFO: Epoch 46 out of 100
+2019-04-29 08:39:13,501:INFO: Evaluating development set...
+2019-04-29 08:40:32,668:INFO: acc 70.82
+2019-04-29 08:40:32,668:INFO: Epoch 47 out of 100
+2019-04-29 08:42:55,047:INFO: Evaluating development set...
+2019-04-29 08:44:16,268:INFO: acc 70.88
+2019-04-29 08:44:16,269:INFO: Epoch 48 out of 100
+2019-04-29 08:47:03,603:INFO: Evaluating development set...
+2019-04-29 08:48:23,133:INFO: acc 70.86
+2019-04-29 08:48:23,134:INFO: Epoch 49 out of 100
+2019-04-29 08:51:09,310:INFO: Evaluating development set...
+2019-04-29 08:52:28,790:INFO: acc 70.89
+2019-04-29 08:52:28,791:INFO: Epoch 50 out of 100
+2019-04-29 08:55:16,195:INFO: Evaluating development set...
+2019-04-29 08:56:35,401:INFO: acc 70.88
+2019-04-29 08:56:35,402:INFO: Epoch 51 out of 100
+2019-04-29 08:59:33,015:INFO: Evaluating development set...
+2019-04-29 09:00:52,098:INFO: acc 70.85
+2019-04-29 09:00:52,099:INFO: Epoch 52 out of 100
+2019-04-29 09:03:40,083:INFO: Evaluating development set...
+2019-04-29 09:04:59,652:INFO: acc 70.89
+2019-04-29 09:04:59,652:INFO: Epoch 53 out of 100
+2019-04-29 09:08:02,281:INFO: Evaluating development set...
+2019-04-29 09:09:22,597:INFO: acc 70.89
+2019-04-29 09:09:22,598:INFO: Epoch 54 out of 100
+2019-04-29 09:11:47,921:INFO: Evaluating development set...
+2019-04-29 09:13:07,755:INFO: acc 70.90
+2019-04-29 09:13:07,755:INFO: Epoch 55 out of 100
+2019-04-29 09:15:43,889:INFO: Evaluating development set...
+2019-04-29 09:17:03,163:INFO: acc 70.88
+2019-04-29 09:17:03,164:INFO: Epoch 56 out of 100
+2019-04-29 09:19:51,885:INFO: Evaluating development set...
+2019-04-29 09:21:11,184:INFO: acc 70.90
+2019-04-29 09:21:11,184:INFO: Epoch 57 out of 100
+2019-04-29 09:23:56,010:INFO: Evaluating development set...
+2019-04-29 09:25:15,521:INFO: acc 70.86
+2019-04-29 09:25:15,522:INFO: Epoch 58 out of 100
+2019-04-29 09:28:03,716:INFO: Evaluating development set...
+2019-04-29 09:29:24,038:INFO: acc 70.82
+2019-04-29 09:29:24,040:INFO: Epoch 59 out of 100
+2019-04-29 09:32:02,857:INFO: Evaluating development set...
+2019-04-29 09:33:22,356:INFO: acc 70.97
+2019-04-29 09:33:22,357:INFO: Epoch 60 out of 100
+2019-04-29 09:36:02,864:INFO: Evaluating development set...
+2019-04-29 09:37:24,011:INFO: acc 70.97
+2019-04-29 09:37:24,012:INFO: Epoch 61 out of 100
+2019-04-29 09:39:35,937:INFO: Evaluating development set...
+2019-04-29 09:40:57,132:INFO: acc 70.92
+2019-04-29 09:40:57,133:INFO: Epoch 62 out of 100
+2019-04-29 09:43:23,567:INFO: Evaluating development set...
+2019-04-29 09:44:43,037:INFO: acc 70.96
+2019-04-29 09:44:43,038:INFO: Epoch 63 out of 100
+2019-04-29 09:47:53,168:INFO: Evaluating development set...
+2019-04-29 09:49:13,230:INFO: acc 70.92
+2019-04-29 09:49:13,231:INFO: Epoch 64 out of 100
+2019-04-29 09:52:06,820:INFO: Evaluating development set...
+2019-04-29 09:53:26,389:INFO: acc 70.89
+2019-04-29 09:53:26,389:INFO: Epoch 65 out of 100
+2019-04-29 09:55:54,236:INFO: Evaluating development set...
+2019-04-29 09:57:14,069:INFO: acc 70.86
+2019-04-29 09:57:14,070:INFO: Epoch 66 out of 100
+2019-04-29 09:59:39,146:INFO: Evaluating development set...
+2019-04-29 10:00:58,631:INFO: acc 70.89
+2019-04-29 10:00:58,632:INFO: Epoch 67 out of 100
+2019-04-29 10:03:31,253:INFO: Evaluating development set...
+2019-04-29 10:04:50,369:INFO: acc 70.90
+2019-04-29 10:04:50,370:INFO: Epoch 68 out of 100
+2019-04-29 10:07:11,302:INFO: Evaluating development set...
+2019-04-29 10:08:30,531:INFO: acc 70.90
+2019-04-29 10:08:30,532:INFO: Epoch 69 out of 100
+2019-04-29 10:11:16,686:INFO: Evaluating development set...
+2019-04-29 10:12:36,237:INFO: acc 70.89
+2019-04-29 10:12:36,238:INFO: Epoch 70 out of 100
+2019-04-29 10:15:32,566:INFO: Evaluating development set...
+2019-04-29 10:16:52,456:INFO: acc 70.89
+2019-04-29 10:16:52,457:INFO: Epoch 71 out of 100
+2019-04-29 10:19:47,841:INFO: Evaluating development set...
+2019-04-29 10:21:07,058:INFO: acc 70.89
+2019-04-29 10:21:07,059:INFO: Epoch 72 out of 100
+2019-04-29 10:24:04,581:INFO: Evaluating development set...
+2019-04-29 10:25:24,401:INFO: acc 70.89
+2019-04-29 10:25:24,402:INFO: Epoch 73 out of 100
+2019-04-29 10:28:13,042:INFO: Evaluating development set...
+2019-04-29 10:29:32,639:INFO: acc 70.89
+2019-04-29 10:29:32,640:INFO: Epoch 74 out of 100
+2019-04-29 10:32:26,395:INFO: Evaluating development set...
+2019-04-29 10:33:45,518:INFO: acc 70.89
+2019-04-29 10:33:45,518:INFO: Epoch 75 out of 100
+2019-04-29 10:36:44,348:INFO: Evaluating development set...
+2019-04-29 10:38:04,001:INFO: acc 70.88
+2019-04-29 10:38:04,001:INFO: Epoch 76 out of 100
+2019-04-29 10:40:47,738:INFO: Evaluating development set...
+2019-04-29 10:42:08,514:INFO: acc 70.88
+2019-04-29 10:42:08,515:INFO: Epoch 77 out of 100
+2019-04-29 10:44:42,003:INFO: Evaluating development set...
+2019-04-29 10:46:01,724:INFO: acc 70.86
+2019-04-29 10:46:01,725:INFO: Epoch 78 out of 100
+2019-04-29 10:49:02,412:INFO: Evaluating development set...
+2019-04-29 10:50:22,424:INFO: acc 70.86
+2019-04-29 10:50:22,424:INFO: Epoch 79 out of 100
+2019-04-29 10:52:54,648:INFO: Evaluating development set...
+2019-04-29 10:54:14,967:INFO: acc 70.82
+2019-04-29 10:54:14,967:INFO: Epoch 80 out of 100
+2019-04-29 10:57:08,532:INFO: Evaluating development set...
+2019-04-29 10:58:31,446:INFO: acc 70.85
+2019-04-29 10:58:31,446:INFO: Epoch 81 out of 100
+2019-04-29 11:01:03,897:INFO: Evaluating development set...
+2019-04-29 11:02:29,423:INFO: acc 70.85
+2019-04-29 11:02:29,424:INFO: Epoch 82 out of 100
+2019-04-29 11:05:10,792:INFO: Evaluating development set...
+2019-04-29 11:06:30,530:INFO: acc 70.83
+2019-04-29 11:06:30,531:INFO: Epoch 83 out of 100
+2019-04-29 11:09:17,357:INFO: Evaluating development set...
+2019-04-29 11:10:36,837:INFO: acc 70.86
+2019-04-29 11:10:36,838:INFO: Epoch 84 out of 100
+2019-04-29 11:13:05,443:INFO: Evaluating development set...
+2019-04-29 11:14:25,277:INFO: acc 70.86
+2019-04-29 11:14:25,278:INFO: Epoch 85 out of 100
+2019-04-29 11:17:01,139:INFO: Evaluating development set...
+2019-04-29 11:18:21,510:INFO: acc 70.88
+2019-04-29 11:18:21,511:INFO: Epoch 86 out of 100
+2019-04-29 11:20:42,204:INFO: Evaluating development set...
+2019-04-29 11:22:02,490:INFO: acc 70.86
+2019-04-29 11:22:02,491:INFO: Epoch 87 out of 100
+2019-04-29 11:24:40,370:INFO: Evaluating development set...
+2019-04-29 11:26:00,245:INFO: acc 70.88
+2019-04-29 11:26:00,246:INFO: Epoch 88 out of 100
+2019-04-29 11:28:46,403:INFO: Evaluating development set...
+2019-04-29 11:30:05,800:INFO: acc 70.88
+2019-04-29 11:30:05,801:INFO: Epoch 89 out of 100
+2019-04-29 11:32:47,997:INFO: Evaluating development set...
+2019-04-29 11:34:08,457:INFO: acc 70.88
+2019-04-29 11:34:08,458:INFO: Epoch 90 out of 100
+2019-04-29 11:36:47,547:INFO: Evaluating development set...
+2019-04-29 11:38:08,548:INFO: acc 70.88
+2019-04-29 11:38:08,549:INFO: Epoch 91 out of 100
+2019-04-29 11:40:59,474:INFO: Evaluating development set...
+2019-04-29 11:42:18,829:INFO: acc 70.86
+2019-04-29 11:42:18,830:INFO: Epoch 92 out of 100
+2019-04-29 11:45:11,567:INFO: Evaluating development set...
+2019-04-29 11:46:31,852:INFO: acc 70.88
+2019-04-29 11:46:31,853:INFO: Epoch 93 out of 100
+2019-04-29 11:49:12,353:INFO: Evaluating development set...
+2019-04-29 11:50:32,312:INFO: acc 70.86
+2019-04-29 11:50:32,313:INFO: Epoch 94 out of 100
+2019-04-29 11:52:57,202:INFO: Evaluating development set...
+2019-04-29 11:54:17,507:INFO: acc 70.88
+2019-04-29 11:54:17,507:INFO: Epoch 95 out of 100
+2019-04-29 11:56:41,542:INFO: Evaluating development set...
+2019-04-29 11:58:01,680:INFO: acc 70.89
+2019-04-29 11:58:01,681:INFO: Epoch 96 out of 100
+2019-04-29 12:00:39,114:INFO: Evaluating development set...
+2019-04-29 12:01:58,909:INFO: acc 70.88
+2019-04-29 12:01:58,910:INFO: Epoch 97 out of 100
+2019-04-29 12:04:45,370:INFO: Evaluating development set...
+2019-04-29 12:06:06,008:INFO: acc 70.89
+2019-04-29 12:06:06,009:INFO: Epoch 98 out of 100
+2019-04-29 12:08:42,230:INFO: Evaluating development set...
+2019-04-29 12:10:03,536:INFO: acc 70.86
+2019-04-29 12:10:03,537:INFO: Epoch 99 out of 100
+2019-04-29 12:12:58,030:INFO: Evaluating development set...
+2019-04-29 12:14:18,889:INFO: acc 70.89
+2019-04-29 12:14:18,890:INFO: Epoch 100 out of 100
+2019-04-29 12:16:55,811:INFO: Evaluating development set...
+2019-04-29 12:18:20,531:INFO: acc 70.86

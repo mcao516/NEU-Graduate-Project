@@ -172,9 +172,9 @@ class CharCNN(nn.Module):
         final_out = torch.relu(self.proj(highway_out))
         final_out = final_out.view(batch_size, max_seq_len, -1)
         final_out = self.dropout(final_out)
-        
+
         return final_out
-    
+        
     
     def _pad_outputs(self, x):
         """In case the max word length is less than the max filter width, 

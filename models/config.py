@@ -18,6 +18,7 @@ class Config():
             datetime.now())
         self.dir_model  = self.dir_output + "model/"
         self.path_log   = self.dir_output + "log.txt"
+        self.path_summary = self.dir_output + "summary"
 
         # directory for training outputs
         if not os.path.exists(self.dir_output):
@@ -60,9 +61,12 @@ class Config():
         self.stop_id = self.word2id[STOP_DECODING]
         self.unk_id = self.word2id[UNKNOWN_TOKEN]
 
+    multi_gpu = True
+    print_samples = False
+
     # embeddings
     dim_word = 100
-    dim_char = 100  
+    dim_char = 50
 
     # glove files
     filename_glove = "data/glove.6B/glove.6B.{}d.txt".format(dim_word)
@@ -71,14 +75,14 @@ class Config():
     use_pretrained = True
 
     # dataset
-    # filename_dev = "data/all_data/new_data/WebNLG_dev.pickle"
-    # filename_test = "data/all_data/new_data/WebNLG_test.pickle"
-    # filename_train = "data/all_data/new_data/WebNLG_train.pickle"
+    filename_dev = "data/webnlg/WebNLG_dev.pickle"
+    filename_test = "data/webnlg/WebNLG_test.pickle"
+    filename_train = "data/webnlg/WebNLG_train.pickle"
     
-    split_type = 'separated'
-    filename_dev = "data/webnlg/re-split-{0}/WebNLG_{0}_dev.pickle".format(split_type)
-    filename_test = "data/webnlg/re-split-{0}/WebNLG_{0}_test.pickle".format(split_type)
-    filename_train = "data/webnlg/re-split-{0}/WebNLG_{0}_train.pickle".format(split_type)
+    # split_type = 'separated'
+    # filename_dev = "data/webnlg/re-split-{0}/WebNLG_{0}_dev.pickle".format(split_type)
+    # filename_test = "data/webnlg/re-split-{0}/WebNLG_{0}_test.pickle".format(split_type)
+    # filename_train = "data/webnlg/re-split-{0}/WebNLG_{0}_train.pickle".format(split_type)
     filename_sample = "data/webnlg/samples.pickle"
 
     max_iter = None # if not None, max number of examples in Dataset
@@ -91,10 +95,10 @@ class Config():
     filename_pronouns = "data/pronouns.txt"
     
     use_chars = True
-    nepochs   = 35
-    nepoch_no_imprv = 5
-    char_emb_type = 'cnn'
-
+    nepochs   = 100
+    nepoch_no_imprv = 100
+    char_emb_type = 'rnn'
+    
     # model hyper parameters
     beam_size = 4
     max_dec_steps = 10
@@ -102,25 +106,32 @@ class Config():
     beam_search = False
     reverse_pos_context = False
     use_context_words = False
-    drop_out = 0.5 # 0.5
+    drop_out = 0.20 # 0.5
     shuffle_dataset = True
-
-    lr = 0.0037
+    scheduler = 'cosine'
+    
+    lr = 0.001
     lr_decay = 0.90
-    batch_size = 128
+    l2_reg = 1e-6
+    batch_size = 64
     batch_size_eva = 1
     grad_clip = 5
     
     hidden_size = 100
     hidden_size_char = 50
-
+ 
     def log_info(self):
         self.logger.info("Embedding file: {}".format(self.filename_glove))
         self.logger.info("Training file: {}".format(self.filename_train))
+        self.logger.info("Word Embedding Size: {}".format(self.dim_word))
         if self.use_chars:
             self.logger.info("Char Embedding Size: {}".format(self.dim_char))
+        self.logger.info("Scheduler Type: {}".format(self.scheduler))
         self.logger.info("Learning Rate: {:.2}".format(self.lr))
+        self.logger.info("Learning Rate Decay: {:.2}".format(self.lr_decay))
+        self.logger.info("L2 Regularization Rate: {:.2}".format(self.l2_reg))
         self.logger.info("Dropout Rate: {:.2}".format(self.drop_out))
         self.logger.info("Batch size: {}".format(self.batch_size))
         self.logger.info("Hidden layer size: {}".format(self.hidden_size))
         self.logger.info("Hidden char size: {}".format(self.hidden_size_char))
+        self.logger.info("Earyly Stop: {}".format(self.nepoch_no_imprv))

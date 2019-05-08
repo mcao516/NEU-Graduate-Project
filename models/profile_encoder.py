@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import copy
 import torch
 
 from torch import nn
@@ -11,20 +12,20 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 class BidirectionalEncoder(nn.Module):
     """Bidirectional LSTM encoder.
     """
-    def __init__(self, input_size, hidden_size, wordEmbed, drop_out=0.5):
+    def __init__(self, input_size, hidden_size, wordEmbed, drop_out=0.1):
         super(BidirectionalEncoder, self).__init__()
-        self.input_size = input_size
         self.hidden_size = hidden_size
-        self.word_embed = wordEmbed # embedding layer
+        self.word_embed = wordEmbed
+        self.encoder = nn.LSTM(input_size, 
+                               hidden_size, 
+                               batch_first=True, 
+                               bidirectional=True)
 
-        self._build_model(drop_out) # build model...
+        self.output_cproj = nn.Linear(hidden_size * 2, hidden_size)
+        self.output_hproj = copy.deepcopy(self.output_cproj)
         
-    def _build_model(self, drop_out):
-        self.encoder = nn.LSTM(self.input_size, self.hidden_size, 
-            batch_first=True, bidirectional=True)
-        self.output_cproj = nn.Linear(self.hidden_size*2, self.hidden_size)
-        self.output_hproj = nn.Linear(self.hidden_size*2, self.hidden_size)
-        self.dropout = nn.Dropout(p=0.1)
+        self.dropout = nn.Dropout(p=drop_out)
+
 
     def forward(self, input_word_ids, input_seq_lens, input_seq_mask, 
                 input_char_ids, input_word_lens):
