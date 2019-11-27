@@ -3,39 +3,70 @@
 
 import torch
 
+from copy import deepcopy
 from torch import nn
-from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+from torch.nn.utils.rnn import pack_padded_sequence
 
 
 class ContextEncoder(nn.Module):
     """Sinal directional LSTM network, encoding pre- and pos-context.
     """
-    def __init__(self, input_size, hidden_size, wordEmbed, drop_out=0.5):
+    def __init__(self, 
+                 input_size, 
+                 hidden_size, 
+                 wordEmbed, 
+                 drop_out=0.1,
+                 pack_sequence=True):
         """Initialize Context Encoder
+
         Args:
-            input_size: input embedding size
-            hidden_size: LSTM hidden size
+            input_size: input embedding size.
+            hidden_size: LSTM hidden size.
+            wordEmbed: nn.Module, embedding layer.
         """
         super(ContextEncoder, self).__init__()
-        self.input_size  = input_size
-        self.hidden_size = hidden_size
-        self.word_embed  = wordEmbed # embedding layer
-        self.drop_out = drop_out
-        
-        self._build_model(self.drop_out)
-    
-    def _build_model(self, drop_out):
-        """Build context-encoder model"""
-        self.pre_rnn = nn.LSTM(self.input_size, self.hidden_size, batch_first=True, bidirectional=True)
-        self.pos_rnn = nn.LSTM(self.input_size, self.hidden_size, batch_first=True, bidirectional=True)
-        self.output_cproj = nn.Linear(self.hidden_size*4, self.hidden_size)
-        self.output_hproj = nn.Linear(self.hidden_size*4, self.hidden_size)
+        self.word_embed = wordEmbed # embedding layer
+        self.pack_sequence = pack_sequence
+
+        self.pre_rnn = nn.LSTM(input_size, 
+                               hidden_size, 
+                               batch_first=True, 
+                               bidirectional=True)
+        self.pos_rnn = deepcopy(self.pre_rnn)
+
+        self.output_cproj = nn.Linear(hidden_size*4, hidden_size)
+        self.output_hproj = deepcopy(self.output_cproj)
         self.tanh = nn.Tanh()
 
         self.dropout = nn.Dropout(p=drop_out)
 
+
+    def _encode(self, inputs, seq_lens=None):
+        """
+        Args:
+            inputs: [batch, seq_len, embedding_dim]
+            seq_lens: [batch]
+        """
+        if seq_lens is not None and self.pack_sequence:
+            # sort inputs by sequence length
+            lens_sorted, idx_sort = torch.sort(seq_lens, dim=0, descending=True)
+            _, idx_unsort = torch.sort(idx_sort, dim=0)
+            inputs = inputs.index_select(0, idx_sort)
+
+            inputs = pack_padded_sequence(inputs, lens_sorted, batch_first=True)
+
+        # (h, c): ([2, batch_size, hidden], [2, batch_size, hidden])
+        _, (h, c) = self.pre_rnn(inputs)
+
+        # restore order
+        h, c = torch.cat((h[0], h[1]), -1), torch.cat((c[0], c[1]), -1)
+        h, c = h.index_select(0, idx_unsort), c.index_select(0, idx_unsort)
+
+        return h, c
+
+
     def forward(self, _pre, _pos):
-        """Encoding context sequences
+        """Encoding context sequences.
         
         Args:
             _pre: (prec_word_ids, prec_seq_lens, prec_char_ids, prec_word_lens)
@@ -43,50 +74,18 @@ class ContextEncoder(nn.Module):
         """
         prec_word_ids, prec_seq_lens, prec_char_ids, prec_word_lens = _pre
         posc_word_ids, posc_seq_lens, posc_char_ids, posc_word_lens = _pos
-        # embed_pre: [batch, max_seq_len, word_dim+char_hidden*2]
+
+        # [batch, max_seq_len, word_dim + char_hidden]
         embed_pre = self.word_embed(prec_word_ids, prec_char_ids, prec_word_lens)
-        # embed_pos: [batch, max_seq_len, word_dim+char_hidden*2]
         embed_pos = self.word_embed(posc_word_ids, posc_char_ids, posc_word_lens)
         
-        # sort lengths
-        prec_lens_sorted, pre_idx_sort = torch.sort(prec_seq_lens, dim=0, descending=True)
-        posc_lens_sorted, pos_idx_sort = torch.sort(posc_seq_lens, dim=0, descending=True)
-        _, pre_idx_unsort = torch.sort(pre_idx_sort, dim=0)
-        _, pos_idx_unsort = torch.sort(pos_idx_sort, dim=0)
-        # sort embedded sentences
-        embed_pre = embed_pre.index_select(0, pre_idx_sort)
-        embed_pos = embed_pos.index_select(0, pos_idx_sort)
-        
-        pre_packed = pack_padded_sequence(embed_pre, prec_lens_sorted, batch_first=True)
-        pos_packed = pack_padded_sequence(embed_pos, posc_lens_sorted, batch_first=True)
-        
-        # pre_state: ([2, batch_size, hidden], [2, batch_size, hidden])
-        _, pre_state = self.pre_rnn(pre_packed)
-        _, pos_state = self.pos_rnn(pos_packed)
-        
-        # restore to the initial order
-        pre_h, pre_c = torch.cat((pre_state[0][0], pre_state[0][1]), -1), torch.cat((pre_state[1][0], pre_state[1][1]), -1)
-        pos_h, pos_c = torch.cat((pos_state[0][0], pos_state[0][1]), -1), torch.cat((pos_state[1][0], pos_state[1][1]), -1)
-        # pre_idx_resort = pre_idx_unsort.view(-1, 1).expand(pre_h.size(0), pre_h.size(1))
-        # pos_idx_resort = pos_idx_unsort.view(-1, 1).expand(pos_h.size(0), pos_h.size(1))
-        # pre_h = pre_h.gather(0, pre_idx_resort)
-        # pre_c = pre_c.gather(0, pre_idx_resort)
-        # pos_h = pos_h.gather(0, pos_idx_resort)
-        # pos_c = pos_c.gather(0, pos_idx_resort)
-        pre_h = pre_h.index_select(0, pre_idx_unsort)
-        pre_c = pre_c.index_select(0, pre_idx_unsort)
-        pos_h = pos_h.index_select(0, pos_idx_unsort)
-        pos_c = pos_c.index_select(0, pos_idx_unsort)
+        pre_h, pre_c = self._encode(embed_pre, prec_seq_lens)
+        pos_h, pos_c = self._encode(embed_pos, posc_seq_lens)
         
         # final_hidd_proj/final_cell_proj: [batch_size, hidden]
-        final_hidd_proj = self.tanh(self.output_hproj(torch.cat((pre_h, pos_h), 1)))
-        final_cell_proj = self.tanh(self.output_cproj(torch.cat((pre_c, pos_c), 1)))
-        
-        del embed_pre, embed_pos, pre_packed, pos_packed
-        del pre_state, pos_state
-        del pre_h, pre_c, pos_h, pos_c
+        h_cat = self.tanh(self.output_hproj(torch.cat((pre_h, pos_h), 1)))
+        c_cat = self.tanh(self.output_cproj(torch.cat((pre_c, pos_c), 1)))
 
-        final_hidd_proj = self.dropout(final_hidd_proj)
-        final_cell_proj = self.dropout(final_cell_proj)
+        h_cat, c_cat = self.dropout(h_cat), self.dropout(c_cat)
 
-        return final_hidd_proj, final_cell_proj
+        return h_cat, c_cat

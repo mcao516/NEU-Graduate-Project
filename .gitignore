@@ -2,5 +2,10 @@
 data/
 
 # Don't track temporary files created by vs-code and jupyter
-.vscode/
-.ipynb_checkpoints/
+**/.vscode/
+**/.ipynb_checkpoints/
+
+# results
+results/
+
+**/__pychche__/

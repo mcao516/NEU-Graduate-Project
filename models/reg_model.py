@@ -10,10 +10,9 @@ from models.decoder import PointerAttentionDecoder
 
 
 class REGModel(nn.Module):
-    def __init__(self, config, device):
+    def __init__(self, config):
         super(REGModel, self).__init__()
         self.config = config
-        self.device = device
         
         # build modules: embedding layer, encoders and decoder
         self.wordEmbed = self._build_embedding_layer()
@@ -53,7 +52,7 @@ class REGModel(nn.Module):
         pointerDecoder = PointerAttentionDecoder(self.config.dim_word, 
                                                  self.config.hidden_size, 
                                                  self.config.nwords, 
-                                                 self.wordEmbed, self.device)
+                                                 self.wordEmbed)
 
         pointerDecoder.setValues(self.config.start_id, self.config.stop_id, 
                                  self.config.unk_id, self.config.npronouns, 
@@ -89,6 +88,7 @@ class REGModel(nn.Module):
             _input, target, dec_lens, dec_mask = dec_input
             total_loss = self.pointerDecoder(hidden_outs, (h_n, c_n), mask, 
                 des_extented_ids, _input, target, dec_lens, dec_mask, decode=False)
+            
             return total_loss
 
 

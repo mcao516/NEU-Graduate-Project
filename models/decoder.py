@@ -24,13 +24,12 @@ class Hypothesis(object):
 class PointerAttentionDecoder(nn.Module):
     """Pointer-generator attention decoder.
     """
-    def __init__(self, input_size, hidden_size, vocab_size, wordEmbed, device):
+    def __init__(self, input_size, hidden_size, vocab_size, wordEmbed):
         super(PointerAttentionDecoder, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.vocab_size = vocab_size
         self.word_embed = wordEmbed
-        self.device = device
 
         self.beam_search = True # if doing beam search
         self.max_article_oov = None # max number of OOVs in a batch of data
@@ -46,7 +45,7 @@ class PointerAttentionDecoder(nn.Module):
         self.Wh = nn.Linear(self.hidden_size*2, self. hidden_size*2)
         self.Ws = nn.Linear(self.hidden_size, self.hidden_size*2)
         self.v  = nn.Linear(self.hidden_size*2, 1)
-
+        
         # parameters for p_gen
         # sigmoid(w_h h* + w_s s + w_x x + b)
         self.w_h = nn.Linear(self.hidden_size*2, 3) # attention context vector
@@ -157,7 +156,7 @@ class PointerAttentionDecoder(nn.Module):
             if self.max_article_oov > 0:
                 # create OOV (but in-article) zero vectors
                 ext_vocab = torch.zeros((batch_size, self.max_article_oov), 
-                                        requires_grad=True, device=self.device)
+                                         requires_grad=True, device=weighted_Pvocab.device)
                 combined_vocab = torch.cat((weighted_Pvocab, ext_vocab), 1)
                 del ext_vocab
             else:
@@ -233,7 +232,7 @@ class PointerAttentionDecoder(nn.Module):
 
         if self.max_article_oov > 0:
             # create OOV (but in-article) zero vectors
-            ext_vocab = torch.zeros((batch_size, self.max_article_oov), device=self.device, requires_grad=True)
+            ext_vocab = torch.zeros((batch_size, self.max_article_oov), device=weighted_Pvocab.device, requires_grad=True)
             combined_vocab = torch.cat((weighted_Pvocab, ext_vocab), 1)
             del ext_vocab
         else:
@@ -257,11 +256,12 @@ class PointerAttentionDecoder(nn.Module):
                Description encoder input with temporary OOV ids repalce 
                each OOV token
         """
+        device = enc_states.device
         with torch.no_grad():
             assert enc_states.size(0) == enc_mask.size(0) == article_inds.size(0) == 1, "In decoding mode, the input batch size must be to 1"
             # _input: [batch_size(beam_size), seq_len]
             assert type(self.start_id) == int
-            _input = torch.tensor([[self.start_id]], dtype=torch.long, device=self.device)
+            _input = torch.tensor([[self.start_id]], dtype=torch.long, device=device)
             init_state = enc_final_state[0].unsqueeze(0), enc_final_state[1].unsqueeze(0)
             enc_h_n = enc_final_state[0]
             decoded_outputs = []
@@ -289,9 +289,10 @@ class PointerAttentionDecoder(nn.Module):
                 # convert OOV words to unk tokens for lookup
                 decode_inds.masked_fill_((decode_inds >= self.vocab_size), self.unk_id)
                 decode_inds = decode_inds.t()
-                _input = torch.tensor(decode_inds, device=self.device)
-                init_state = (torch.tensor(init_h.unsqueeze(0), device=self.device), 
-                              torch.tensor(init_c.unsqueeze(0), device=self.device))
+                
+                _input = torch.tensor(decode_inds, device=device)
+                init_state = (torch.tensor(init_h.unsqueeze(0), device=device), 
+                              torch.tensor(init_c.unsqueeze(0), device=device))
 
             non_terminal_output = sorted(all_hyps, key=lambda x:x.survivability, reverse=True)
             sorted_outputs = sorted(decoded_outputs, key=lambda x:x.survivability, reverse=True)
@@ -349,9 +350,10 @@ class PointerAttentionDecoder(nn.Module):
                Description as encoder input with temporary OOV ids repalce 
                each OOV token
         """
+        device = enc_states.device
         with torch.no_grad():
             assert enc_states.size(0) == enc_mask.size(0) == article_inds.size(0) == 1, "In decoding mode, the input batch size must be to 1"
-            _input = torch.tensor([[self.start_id]], dtype=torch.long, device=self.device)
+            _input = torch.tensor([[self.start_id]], dtype=torch.long, device=device)
             init_state = enc_final_state[0].unsqueeze(0), enc_final_state[1].unsqueeze(0)
             enc_h_n = enc_final_state[0]
             decode_outputs, switches = [self.start_id], [[0, 0, 0]]
@@ -367,7 +369,7 @@ class PointerAttentionDecoder(nn.Module):
                 
                 assert inds.size(0) == inds.size(1) == 1
                 if inds.max().item() >= self.vocab_size:
-                    _input = torch.tensor([[self.unk_id]], device=self.device)
+                    _input = torch.tensor([[self.unk_id]], device=device)
                 else:
                     _input = inds.detach()
                 init_state = (next_h.unsqueeze(0), next_c.unsqueeze(0))

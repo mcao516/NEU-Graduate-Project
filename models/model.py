@@ -3,36 +3,68 @@
 
 import os
 import torch
+import torch.nn as nn
 
+from tensorboardX import SummaryWriter
 from torch.nn.utils import clip_grad_norm_
 from models.reg_model import REGModel
 from models.data_utils import minibatches
 from models.general_utils import Progbar
-
+from torch.optim.lr_scheduler import ExponentialLR, CosineAnnealingLR, MultiStepLR
+    
 
 class REGShell(object):
-    def __init__(self, config, device):
+    """Class for REG model training, evaluation and test."""
+
+    def __init__(self, config, device, write_summary=True):
         super(REGShell, self).__init__()
         self.config = config
         self.logger = config.logger
 
+        # set training device
         self.device = device
+
+        self.logger.info("- Start building REG model...")
         self.regModel = self._build_model() # build model
+        
+        # multi-gpu training
+        if torch.cuda.device_count() > 1 and config.multi_gpu:
+            self.logger.info("Let's use {} GPUs!".format(torch.cuda.device_count()))
+            self.model = nn.DataParallel(self.regModel)
         self.regModel.to(device)
-
+        
         self.optimizer = self._get_optimizer(self.regModel)
+        self.scheduler = self._get_scheduler(self.optimizer)
 
+        # create summary for tensorboard visualization
+        if write_summary:
+            self.writer = SummaryWriter(self.config.path_summary)
+        else:
+            self.writer = None
+        
     def _build_model(self):
         """Build reference expression generation model.
         """
-        return REGModel(self.config, self.device)
-
+        return REGModel(self.config)
 
     def _get_optimizer(self, model):
         """Create optimizer for training.
         """
-        return torch.optim.Adam(model.parameters(), lr=self.config.lr) 
+        return torch.optim.Adam(model.parameters(), 
+                                lr=self.config.lr, 
+                                weight_decay=self.config.l2_reg) 
 
+    def _get_scheduler(self, optimizer):
+        """Learning rate scheduler for Cosine Annealing.
+        """
+        if self.config.scheduler == 'exp':
+            return ExponentialLR(optimizer, self.config.lr_decay)
+        elif self.config.scheduler == 'multi':
+            return MultiStepLR(optimizer, milestones=[20, 40, 60], gamma=0.1)
+        elif self.config.scheduler == 'cosine':
+            return CosineAnnealingLR(optimizer, 20, eta_min=0)
+        else:
+            raise ValueError("Unknown scheduler type!")
 
     def save_model(self):
         """Saves session = weights"""
@@ -43,12 +75,58 @@ class REGShell(object):
         torch.save(self.regModel.state_dict(), save_path)
         self.logger.info("- model saved at: {}".format(save_path))
         
-
     def restore_model(self, dir_model):
         self.regModel.load_state_dict(torch.load(dir_model))
         self.logger.info("- model restored from: {}".format(dir_model))
+
+    def run_epoch(self, train, dev, epoch, samples=None):
+        """Performs one complete pass over the train set and evaluate on dev
+
+        Args:
+            epoch: (int) index of the current epoch
+
+        Returns:
+            f1: (python float), score to select model on, higher is better
+            
+        """
+        # train mode
+        self.regModel.train()
+
+        # progbar stuff for logging
+        batch_size = self.config.batch_size
+        nbatches = (len(train) + batch_size - 1) // batch_size
+        prog = Progbar(target=nbatches)
+
+        # iterate over dataset
+        epoch_loss = 0.
+        for i, batch in enumerate(minibatches(train, batch_size)):
+            # convert numpy data into torch tensor
+            context_input, des_input, dec_input = self.data_prepare(batch)
+            total_losses = self.regModel(context_input, des_input, dec_input, decode_flag=False)
+            batch_loss = total_losses.mean()
+            batch_loss.backward() # backward propagation
+
+            # gradient clipping by norm
+            if self.config.grad_clip > 0:
+                clip_grad_norm_(self.regModel.parameters(), self.config.grad_clip)
+            
+            # update
+            self.optimizer.step()
+            self.optimizer.zero_grad()
+            
+            # log loss information
+            batch_loss = batch_loss.item()
+            epoch_loss += batch_loss
+            
+            prog.update(i + 1, [("train loss",  batch_loss)])
+            self.writer.add_scalar('batch_loss', batch_loss, epoch * nbatches + i + 1)
         
-        
+        epoch_loss = epoch_loss / nbatches
+        self.scheduler.step() # update learning rate
+
+        return epoch_loss
+
+
     def train(self, train, dev, sample_set=None):
         """Performs training with early stopping and lr exponential decay
         """
@@ -56,14 +134,30 @@ class REGShell(object):
         self.logger.info('start training...')
         best_score, nepoch_no_imprv = 0, 0 # for early stopping
         for epoch in range(self.config.nepochs):
-            self.logger.info("Epoch {:} out of {:}".format(epoch + 1, 
-                    self.config.nepochs))
+            self.logger.info("Epoch {:} out of {:}".format(epoch + 1, self.config.nepochs))
 
             # shuffle the dataset
-            if self.config.shuffle_dataset:
-                train.shuffle()
-            score = self.run_epoch(train, dev, epoch, samples=sample_set)
-            self.config.lr *= self.config.lr_decay # decay learning rate
+            if self.config.shuffle_dataset: train.shuffle()
+            epoch_loss = self.run_epoch(train, dev, epoch)
+
+            # print out samples
+            if sample_set is not None and self.config.print_samples:
+                self.logger.info('Evaluating samples...')
+                for pres, contexts, des, refex, oovs in zip(self.predict(sample_set)[:-1]):
+                    self.displayOutput(pres, contexts, des, refex, oovs)
+
+            # evaluate the model
+            self.logger.info('Evaluating development set...')
+            metrics = self.run_evaluate(dev)
+            msg = " - ".join(["{} {:04.2f}".format(k, v)
+                    for k, v in metrics.items()])
+            self.logger.info(msg)
+            score = metrics["acc"]
+
+            # write summary
+            self.writer.add_scalar('epoch_loss', epoch_loss, epoch + 1)
+            self.writer.add_scalar('evaluate_acc', score, epoch + 1)
+            self.writer.add_scalar('lr', self.scheduler.get_lr()[0], epoch + 1)
 
             # early stopping and saving best parameters
             if score >= best_score:
@@ -77,58 +171,10 @@ class REGShell(object):
                     self.logger.info("- early stopping {} epochs without "\
                             "improvement".format(nepoch_no_imprv))
                     break
-    
-    def run_epoch(self, train, dev, epoch, samples=None):
-        """Performs one complete pass over the train set and evaluate on dev
 
-        Args:
-            epoch: (int) index of the current epoch
-
-        Returns:
-            f1: (python float), score to select model on, higher is better
-            
+    def displayOutput(self, pres, context, description, refex, oovs, show_ground_truth=True):
+        """Print out prediction samples during training.
         """
-        # progbar stuff for logging
-        batch_size = self.config.batch_size
-        nbatches = (len(train) + batch_size - 1) // batch_size
-        prog = Progbar(target=nbatches)
-
-        # iterate over dataset
-        for i, batch in enumerate(minibatches(train, batch_size)):
-            # convert numpy data into torch tensor
-            context_input, des_input, dec_input = self.data_prepare(batch)
-            total_losses = self.regModel(context_input, des_input, dec_input, decode_flag=False)
-            batch_loss = total_losses.mean()
-            batch_loss.backward() # backward propagation
-
-            # gradient clipping by norm
-            if self.config.grad_clip > 0:
-                clip_grad_norm_(self.regModel.parameters(), self.config.grad_clip)
-            # update
-            self.optimizer.step()
-            self.optimizer.zero_grad()
-
-            prog.update(i + 1, [("train loss",  batch_loss.detach())])
-
-        # print out samples
-        # self.predict(dataset)
-        if samples is not None:
-            self.logger.info('Evaluating samples...')
-            pred_strings, all_contexts, all_des, all_refex, all_oovs, _ = self.predict(samples)
-            for pres, contexts, des, refex, oovs in zip(pred_strings, all_contexts, all_des, all_refex, all_oovs):
-                self.displayOutput(pres, contexts, des, refex, oovs)
-        
-        # evaluate the model
-        self.logger.info('Evaluating development set...')
-        metrics = self.run_evaluate(dev)
-        msg = " - ".join(["{} {:04.2f}".format(k, v)
-                for k, v in metrics.items()])
-        self.logger.info(msg)
-
-        return metrics["acc"]
-
-    def displayOutput(self, pres, context, description, refex, oovs, 
-        show_ground_truth=True):
         if show_ground_truth:
             self.logger.info('- CONTEXT: {}'.format(context))
             self.logger.info('- DESCRIPTION: {}'.format(description))
@@ -136,7 +182,7 @@ class REGShell(object):
         for i, pred in enumerate(pres):
             # [0, nwords - 1] [nwords, nwords+m-1]
             self.logger.info('- #{}: {}'.format((i+1), pred))
-    
+
     def predict_batch(self, context_input, des_input, beam_search=True):
         """Predict referring expression on a batch of data
 
@@ -176,8 +222,7 @@ class REGShell(object):
             
         """
         self.regModel.eval() # set model to eval mode
-        assert self.regModel.training == False
-        assert self.regModel.con_encoder.training == False
+
         # progbar stuff for logging
         batch_size = self.config.batch_size_eva
         nbatches = (len(test) + batch_size - 1) // batch_size
@@ -206,8 +251,8 @@ class REGShell(object):
             total += 1
             # update progress bar
             prog.update(i + 1, [("acc", correct/total)])
-        acc = correct/total
-        self.regModel.train() # set model to train mode
+        acc = correct / total
+        
         return {"acc": 100*acc}
     
 
@@ -225,6 +270,7 @@ class REGShell(object):
             self.logger.info("- beam searching")
         else:
             self.logger.info("- greedy decoding")
+
         for i, batch in enumerate(minibatches(dataset, 1)):
             context_input, des_input, _ = self.data_prepare(batch)
             preds, switches = self.predict_batch(context_input, des_input, beam_search=self.config.beam_search)
@@ -254,7 +300,6 @@ class REGShell(object):
                     generated = ' '.join([self.config.id2word[ind] if ind < self.config.nwords else oovs[ind % self.config.nwords] for ind in pred])
                     beams += [generated]
                 pred_strings.append(beams)
-        self.regModel.train() # set model to train mode
 
         return pred_strings, all_contexts, all_des, all_refex, all_oovs, all_switches
     
