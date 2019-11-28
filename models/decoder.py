@@ -39,20 +39,20 @@ class PointerAttentionDecoder(nn.Module):
     def _build_model(self):
         # lstm decoder
         self.decoderRNN = nn.LSTM(self.input_size, self.hidden_size, batch_first=True)
-        
+
         # params for attention
         # v tanh(W_h h + W_s s + b)
-        self.Wh = nn.Linear(self.hidden_size*2, self. hidden_size*2)
+        self.Wh = nn.Linear(self.hidden_size*2, self.hidden_size*2)
         self.Ws = nn.Linear(self.hidden_size, self.hidden_size*2)
         self.v  = nn.Linear(self.hidden_size*2, 1)
-        
+
         # parameters for p_gen
         # sigmoid(w_h h* + w_s s + w_x x + b)
         self.w_h = nn.Linear(self.hidden_size*2, 3) # attention context vector
         self.w_s = nn.Linear(self.hidden_size, 3) # hidden state
         self.w_x = nn.Linear(self.input_size, 3) # input vector
         self.w_c = nn.Linear(self.hidden_size, 3) # context encoder final hidden state
-        
+
         # params for output proj
         self.V = nn.Linear(self.hidden_size*3, self.vocab_size)
 
@@ -69,8 +69,8 @@ class PointerAttentionDecoder(nn.Module):
         self.beam_size = beam_size
         self.min_length = min_decode
         self.max_decode_steps = max_decode
-        
-    def forward(self, enc_states, enc_final_state, enc_mask, article_inds, 
+
+    def forward(self, enc_states, enc_final_state, enc_mask, article_inds,
                 _input, targets, dec_lens, dec_mask, decode=False):
         """enc_states [batch, max_seq_len, 2*hidden_size]:
                Output states of descirption bidirectional encoder.
@@ -97,28 +97,28 @@ class PointerAttentionDecoder(nn.Module):
                 return self.decode(enc_states, enc_final_state, enc_mask, article_inds)
             else:
                 return self.greedy_decoding(enc_states, enc_final_state, enc_mask, article_inds)
-        
+
         # for attention calculation
         # enc_proj: [batch_size, max_enc_len, 2*hidden]
         batch_size, max_enc_len, enc_size = enc_states.size()
         enc_proj = self.Wh(enc_states.view(batch_size*max_enc_len, enc_size)).view(batch_size, max_enc_len, -1)	
-        
+
         # embed_input: [batch_size, dec_seq_len, embedding_dim]
         embed_input = self.word_embed(_input)
         # state: ([1, batch_size, hidden_size], ...)
         state = enc_final_state[0].unsqueeze(0), enc_final_state[1].unsqueeze(0)
-        # hidden: [batch_size, dec_seq_len, hidden_size] 
+        # hidden: [batch_size, dec_seq_len, hidden_size]
         hidden, _ = self.decoderRNN(embed_input, state)
-        
+
         lm_loss = []
-        
+
         max_dec_len = _input.size(1)
         # step through decoder hidden states
         for _step in range(max_dec_len):
-            _h = hidden[:, _step, :] # _h: [batch_size, hidden_size]
-            target = targets[:, _step].unsqueeze(1) # target: [batch_size, 1]
+            _h = hidden[:, _step, :]  # _h: [batch_size, hidden_size]
+            target = targets[:, _step].unsqueeze(1)  # target: [batch_size, 1]
             # mask: [batch_size, 1]
-            target_mask_0 = dec_mask[:, _step].unsqueeze(1) 
+            target_mask_0 = dec_mask[:, _step].unsqueeze(1)
             # dec_proj: [batch_size, max_enc_len, 2*hidden_size]
             dec_proj = self.Ws(_h).unsqueeze(1).expand_as(enc_proj)
             # dropout
@@ -132,7 +132,7 @@ class PointerAttentionDecoder(nn.Module):
             # attn_scores: [batch_size, max_enc_len]
             attn_scores = F.softmax(attn_scores, 1)
             del e_t
-            
+
             # context: [batch_size, 2*hidden_size]
             context = attn_scores.unsqueeze(1).bmm(enc_states).squeeze(1)
             # p_vocab: [batch_size, vocab_size]
@@ -146,17 +146,16 @@ class PointerAttentionDecoder(nn.Module):
 
             p_gen = torch.cat((p_switch[:, 0].view(-1, 1).expand(batch_size, self.vocab_size-self.nprons), p_switch[:, 1].view(-1, 1).expand(batch_size, self.nprons)), dim=1)
             assert p_gen.size(0) == batch_size and p_gen.size(1) == self.vocab_size
-            p_copy = p_switch[:, 2].view(-1, 1) # [batch_size, 1]
+            p_copy = p_switch[:, 2].view(-1, 1)  # [batch_size, 1]
 
             # weighted_Pvocab: [batch_size, vocab_sze]
-            weighted_Pvocab = p_gen * p_vocab 
-            weighted_attn = p_copy * attn_scores # [batch_size, max_enc_len]
+            weighted_Pvocab = p_gen * p_vocab
+            weighted_attn = p_copy * attn_scores  # [batch_size, max_enc_len]
             assert weighted_attn.size(0) == batch_size and weighted_attn.size(1) == max_enc_len
 
             if self.max_article_oov > 0:
                 # create OOV (but in-article) zero vectors
-                ext_vocab = torch.zeros((batch_size, self.max_article_oov), 
-                                         requires_grad=True, device=weighted_Pvocab.device)
+                ext_vocab = torch.zeros((batch_size, self.max_article_oov), requires_grad=True, device=weighted_Pvocab.device)
                 combined_vocab = torch.cat((weighted_Pvocab, ext_vocab), 1)
                 del ext_vocab
             else:
